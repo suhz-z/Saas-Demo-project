@@ -1,7 +1,9 @@
 import { Suspense } from "react";
 import { getSavedCourses } from "@/services/shortlist";
-import { getCurrentUser, requireAuth } from "@/lib/auth";
+import { requireAuth } from "@/lib/auth";
 import { SavedCoursesClient } from "@/components/modules/counselor/SavedCoursesClient";
+
+export const dynamic = "force-dynamic";
 
 export default async function SavedCoursesPage() {
   const user = await requireAuth();

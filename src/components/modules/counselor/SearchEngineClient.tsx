@@ -36,7 +36,7 @@ export function SearchEngineClient({ domains, userId }: { domains: { id: string,
     setSavingCourseId(courseId);
     try {
       if (savedCourses.has(courseId)) {
-        await removeSavedCourse(userId, courseId);
+        await removeSavedCourse(courseId);
         setSavedCourses(new Set([...savedCourses].filter(id => id !== courseId)));
       } else {
         await saveCourse(userId, courseId, matchScore);

@@ -1,23 +1,28 @@
 "use server";
 
-import { Document, Packer, Paragraph, Table as DocTable, TableRow, TableCell, WidthType, TextRun, UnderlineType } from "docx";
-import { writeFile } from "fs/promises";
-import { tmpdir } from "os";
-import { join } from "path";
+import { Document, Packer, Paragraph, Table as DocTable, TableRow, TableCell, WidthType, TextRun } from "docx";
 import { Workbook } from "exceljs";
 
 export async function generatePDFReport(courses: any[]) {
   try {
-    const sections = courses.map(saved => [
+    const sections = courses.map((saved) => [
       new Paragraph({
-        text: saved.course.name,
-        bold: true,
-        size: 28,
+        children: [
+          new TextRun({
+            text: saved.course.name,
+            bold: true,
+            size: 28,
+          }),
+        ],
       }),
       new Paragraph({
-        text: `${saved.course.university.name} • ${saved.course.university.country.name}`,
-        italics: true,
-        size: 20,
+        children: [
+          new TextRun({
+            text: `${saved.course.university.name} - ${saved.course.university.country.name}`,
+            italics: true,
+            size: 20,
+          }),
+        ],
         spacing: { after: 100 },
       }),
       new DocTable({
@@ -38,7 +43,9 @@ export async function generatePDFReport(courses: any[]) {
           new TableRow({
             children: [
               new TableCell({ children: [new Paragraph("Fees")] }),
-              new TableCell({ children: [new Paragraph(`${saved.course.currency} ${saved.course.tuitionFees.toLocaleString()}`)] }),
+              new TableCell({
+                children: [new Paragraph(`${saved.course.currency} ${saved.course.tuitionFees.toLocaleString()}`)],
+              }),
             ],
           }),
           new TableRow({
@@ -56,9 +63,7 @@ export async function generatePDFReport(courses: any[]) {
           new TableRow({
             children: [
               new TableCell({ children: [new Paragraph("Match Score")] }),
-              new TableCell({ 
-                children: [new Paragraph(`${saved.score.toFixed(0)}%`)] 
-              }),
+              new TableCell({ children: [new Paragraph(`${saved.score.toFixed(0)}%`)] }),
             ],
           }),
           new TableRow({
@@ -77,19 +82,31 @@ export async function generatePDFReport(courses: any[]) {
         {
           children: [
             new Paragraph({
-              text: "Study Abroad Course Recommendations",
-              bold: true,
-              size: 32,
+              children: [
+                new TextRun({
+                  text: "Study Abroad Course Recommendations",
+                  bold: true,
+                  size: 32,
+                }),
+              ],
               spacing: { after: 100 },
             }),
             new Paragraph({
-              text: `Generated on: ${new Date().toLocaleDateString()}`,
-              size: 20,
+              children: [
+                new TextRun({
+                  text: `Generated on: ${new Date().toLocaleDateString()}`,
+                  size: 20,
+                }),
+              ],
               spacing: { after: 200 },
             }),
             new Paragraph({
-              text: `Total Courses: ${courses.length}`,
-              size: 20,
+              children: [
+                new TextRun({
+                  text: `Total Courses: ${courses.length}`,
+                  size: 20,
+                }),
+              ],
               spacing: { after: 300 },
             }),
             ...sections.flat(),
@@ -100,8 +117,7 @@ export async function generatePDFReport(courses: any[]) {
 
     const buffer = await Packer.toBuffer(doc);
     const filename = `saved-courses-${Date.now()}.docx`;
-    
-    // For server-side download, we return the buffer and let the client handle it
+
     return { success: true, buffer, filename };
   } catch (err) {
     console.error("PDF generation error:", err);
@@ -114,7 +130,6 @@ export async function generateExcelReport(courses: any[]) {
     const workbook = new Workbook();
     const worksheet = workbook.addWorksheet("Courses");
 
-    // Add headers
     const headerRow = worksheet.addRow([
       "Course Name",
       "University",
@@ -137,8 +152,7 @@ export async function generateExcelReport(courses: any[]) {
       fgColor: { argb: "FF10B981" },
     };
 
-    // Add course data
-    courses.forEach(saved => {
+    courses.forEach((saved) => {
       worksheet.addRow([
         saved.course.name,
         saved.course.university.name,
@@ -155,7 +169,6 @@ export async function generateExcelReport(courses: any[]) {
       ]);
     });
 
-    // Adjust column widths
     worksheet.columns = [
       { width: 30 },
       { width: 25 },

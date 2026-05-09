@@ -82,10 +82,16 @@ export function EligibilityDialog({ courseId, courseName }: { courseId: string, 
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-700 hover:bg-blue-50">
-          <ClipboardCheck size={16} />
-        </Button>
+      <DialogTrigger
+        render={
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+          />
+        }
+      >
+        <ClipboardCheck size={16} />
       </DialogTrigger>
       <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>

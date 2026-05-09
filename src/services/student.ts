@@ -1,7 +1,6 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { StudyLevel } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
 export async function getStudents(search?: string, page = 1, limit = 10) {
@@ -57,10 +56,4 @@ export async function createStudent(data: {
 export async function deleteStudent(id: string) {
   await prisma.studentProfile.delete({ where: { id } });
   revalidatePath("/counselor/students");
-}
-
-export async function saveCourseToStudent(studentId: string, courseId: string, score: number) {
-  await prisma.savedCourse.upsert({
-    where: { userId_courseId: { userId: "some-user", courseId } }, // Wait, schema uses userId but actually it should be studentProfileId. Let me check the schema.
-  });
 }
