@@ -82,11 +82,11 @@ export default function LoginPage() {
             <span className="text-[16px] font-bold tracking-widest uppercase text-white/90">SACDMS</span>
           </div>
 
-          <h1 className="text-[2.75rem] font-bold tracking-tight mb-6 leading-[1.15]">
-            <span className="text-white/90">Intelligent</span>
+          <h1 className="text-[2.4rem] font-bold tracking-tight mb-6 leading-[1.15]">
+            <span className="text-white/90">Study Abroad Course</span>
             <br />
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary via-blue-400 to-primary bg-300% animate-gradient">
-              Course Discovery
+              Discovery & Management
             </span>
           </h1>
           <p className="text-[16px] text-zinc-400 leading-relaxed mb-14 max-w-md font-medium">
@@ -179,13 +179,13 @@ export default function LoginPage() {
 
               <Button
                 type="submit"
-                className="w-full h-11 rounded-xl bg-primary hover:bg-primary/90 text-[14px] font-medium shadow-xl shadow-primary/25 hover:shadow-primary/40 transition-all duration-300 group"
+                className="w-full h-11 rounded-xl bg-primary hover:bg-primary/90 text-[14px] font-medium shadow-xl shadow-primary/20 hover:shadow-primary/40 transition-all duration-300 group border-0 bg-clip-border outline-none ring-0 focus:ring-0 focus:outline-none"
                 disabled={isLoading}
               >
                 {isLoading ? (
                   <Loader2 className="h-5 w-5 animate-spin" />
                 ) : (
-                  <>Sign in <ArrowRight className="ml-2 h-4 w-4 opacity-70 group-hover:translate-x-1 transition-transform" /></>
+                  <>Sign in <ArrowRight className="ml-2 h-4 w-4 opacity-70 transition-transform" /></>
                 )}
               </Button>
             </form>
@@ -194,6 +194,22 @@ export default function LoginPage() {
           <p className="mt-8 text-center text-[13px] text-muted-foreground">
             Need help? <button className="text-primary font-medium hover:underline">Contact support</button>
           </p>
+
+          <div className="mt-8 pt-6 border-t border-border/50">
+            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-3">Demo Accounts</p>
+            <div className="grid grid-cols-2 gap-2">
+              <div className="p-2.5 rounded-lg bg-muted/30 border border-border/50">
+                <p className="text-[11px] font-bold text-foreground mb-0.5">Administrator</p>
+                <p className="text-[11px] text-muted-foreground truncate">admin@sacdms.com</p>
+                <p className="text-[10px] text-primary font-medium mt-1">password123</p>
+              </div>
+              <div className="p-2.5 rounded-lg bg-muted/30 border border-border/50">
+                <p className="text-[11px] font-bold text-foreground mb-0.5">Counselor</p>
+                <p className="text-[11px] text-muted-foreground truncate">counselor@sacdms.com</p>
+                <p className="text-[10px] text-primary font-medium mt-1">password123</p>
+              </div>
+            </div>
+          </div>
         </motion.div>
       </div>
     </div>

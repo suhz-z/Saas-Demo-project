@@ -16,17 +16,14 @@ export default async function UniversitiesPage({
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex flex-col gap-1">
           <h1 className="text-3xl font-bold tracking-tight">Universities</h1>
           <p className="text-muted-foreground text-[15px]">Manage partner institutions and their details.</p>
         </div>
-        <div className="flex gap-2">
-          <BulkUploadDialog type="Universities" onUpload={bulkCreateUniversities} />
-          <UniversityFormDialog />
-        </div>
-      </div>
-      <UniversityTable data={result.data} total={result.total} page={result.page} totalPages={result.totalPages} query={query} />
+      <UniversityTable data={result.data} total={result.total} page={result.page} totalPages={result.totalPages} query={query}>
+        <BulkUploadDialog type="Universities" onUpload={bulkCreateUniversities} />
+        <UniversityFormDialog />
+      </UniversityTable>
     </div>
   );
 }

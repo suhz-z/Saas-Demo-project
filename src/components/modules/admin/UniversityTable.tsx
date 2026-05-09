@@ -10,7 +10,7 @@ import { deleteUniversity } from "@/services/university";
 import { motion, AnimatePresence } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 
-export function UniversityTable({ data, total, page, totalPages, query }: any) {
+export function UniversityTable({ data, total, page, totalPages, query, children }: any) {
   const router = useRouter();
   const [search, setSearch] = useState(query);
 
@@ -38,6 +38,9 @@ export function UniversityTable({ data, total, page, totalPages, query }: any) {
             className="pl-9 h-9 bg-white dark:bg-card border-border/50 focus-visible:ring-primary/20 rounded-lg text-[13px]"
           />
         </form>
+        <div className="flex gap-2">
+          {children}
+        </div>
       </div>
 
       {/* Table */}

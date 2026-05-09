@@ -32,10 +32,10 @@ export default function AdminDashboardClient({
   };
 
   const stats = [
-    { label: "Universities", value: universityCount, icon: <Building2 size={20} />, color: "text-blue-600", bg: "bg-blue-500/8" },
-    { label: "Courses", value: courseCount, icon: <BookOpen size={20} />, color: "text-indigo-600", bg: "bg-indigo-500/8" },
-    { label: "Users", value: userCount, icon: <Users size={20} />, color: "text-violet-600", bg: "bg-violet-500/8" },
-    { label: "Countries", value: countryCount, icon: <MapPin size={20} />, color: "text-emerald-600", bg: "bg-emerald-500/8" },
+    { label: "Universities", value: universityCount, icon: <Building2 size={16} />, color: "text-blue-600", bg: "bg-blue-500/10", border: "border-blue-500/20" },
+    { label: "Courses", value: courseCount, icon: <BookOpen size={16} />, color: "text-indigo-600", bg: "bg-indigo-500/10", border: "border-indigo-500/20" },
+    { label: "Users", value: userCount, icon: <Users size={16} />, color: "text-violet-600", bg: "bg-violet-500/10", border: "border-violet-500/20" },
+    { label: "Countries", value: countryCount, icon: <MapPin size={16} />, color: "text-emerald-600", bg: "bg-emerald-500/10", border: "border-emerald-500/20" },
   ];
 
   return (
@@ -55,15 +55,15 @@ export default function AdminDashboardClient({
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         {stats.map((stat, idx) => (
           <motion.div key={idx} variants={item}>
-            <Card className="border border-border/50 shadow-sm hover:shadow-md transition-shadow bg-white dark:bg-card">
-              <CardContent className="pt-6">
-                <div className="flex items-start justify-between">
-                  <div className="space-y-2">
-                    <p className="text-[13px] font-medium text-muted-foreground">{stat.label}</p>
-                    <p className="text-3xl font-bold tracking-tight">{stat.value}</p>
-                  </div>
-                  <div className={`h-10 w-10 rounded-xl ${stat.bg} flex items-center justify-center ${stat.color}`}>
+            <Card className="border-border/60 shadow-sm hover:shadow-md transition-shadow bg-white dark:bg-card">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-4">
+                  <div className={`h-10 w-10 shrink-0 rounded-lg ${stat.bg} border ${stat.border} flex items-center justify-center ${stat.color}`}>
                     {stat.icon}
+                  </div>
+                  <div className="space-y-0.5 min-w-0">
+                    <p className="text-[12px] font-medium text-muted-foreground uppercase tracking-wider truncate">{stat.label}</p>
+                    <p className="text-xl font-bold tracking-tight text-foreground truncate">{stat.value.toLocaleString()}</p>
                   </div>
                 </div>
               </CardContent>

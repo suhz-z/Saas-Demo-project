@@ -26,9 +26,10 @@ type UserTableProps = {
   page: number;
   totalPages: number;
   query: string;
+  children?: React.ReactNode;
 };
 
-export function UserTable({ data, total, page, totalPages, query }: UserTableProps) {
+export function UserTable({ data, total, page, totalPages, query, children }: UserTableProps) {
   const router = useRouter();
   const [search, setSearch] = useState(query);
 
@@ -60,6 +61,9 @@ export function UserTable({ data, total, page, totalPages, query }: UserTablePro
             className="pl-9 h-9 bg-white dark:bg-card border-border/50 focus-visible:ring-primary/20 rounded-lg text-[13px]"
           />
         </form>
+        <div className="flex gap-2">
+          {children}
+        </div>
       </div>
 
       {/* Table */}
