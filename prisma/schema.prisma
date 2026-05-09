@@ -1,0 +1,182 @@
+// prisma/schema.prisma
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch"]
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  ADMIN
+  COUNSELOR
+}
+
+enum EligibilityStatus {
+  ELIGIBLE
+  BORDERLINE
+  NOT_ELIGIBLE
+}
+
+enum StudyLevel {
+  DIPLOMA
+  ADVANCED_DIPLOMA
+  BACHELORS
+  PG_DIPLOMA
+  MASTERS
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         Role     @default(COUNSELOR)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  searchHistory SearchHistory[]
+  savedCourses  SavedCourse[]
+}
+
+model Country {
+  id           String       @id @default(uuid())
+  name         String       @unique
+  code         String       @unique
+  universities University[]
+}
+
+model Domain {
+  id      String   @id @default(uuid())
+  name    String   @unique
+  courses Course[]
+}
+
+model University {
+  id            String   @id @default(uuid())
+  name          String
+  countryId     String
+  country       Country  @relation(fields: [countryId], references: [id])
+  city          String
+  ranking       Int?
+  website       String?
+  partnerStatus Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  courses Course[]
+
+  @@index([name])
+  @@index([countryId])
+}
+
+model Course {
+  id           String     @id @default(uuid())
+  name         String
+  universityId String
+  university   University @relation(fields: [universityId], references: [id])
+  studyLevel   StudyLevel
+  domainId     String
+  domain       Domain     @relation(fields: [domainId], references: [id])
+  degreeType   String
+  duration     Int        // Duration in months
+  tuitionFees  Float
+  currency     String
+  intake       String     // e.g., "Fall", "Spring" or JSON array
+  description  String?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  eligibilityRules EligibilityRule[]
+  savedBy          SavedCourse[]
+
+  @@index([name])
+  @@index([studyLevel])
+  @@index([universityId])
+  @@index([domainId])
+}
+
+model EligibilityRule {
+  id               String   @id @default(uuid())
+  courseId         String
+  course           Course   @relation(fields: [courseId], references: [id])
+  min10thMarks     Float?
+  min12thMarks     Float?
+  minGradMarks     Float?
+  requiredDegree   String?
+  minIeltsOverall  Float?
+  minIeltsReading  Float?
+  minIeltsWriting  Float?
+  minIeltsSpeaking Float?
+  minIeltsListening Float?
+  minExperience    Int?     // In months
+  maxBacklogs      Int?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([courseId])
+}
+
+model AcademicCycle {
+  id                  String   @id @default(uuid())
+  intakeName          String
+  month               Int
+  year                Int
+  applicationDeadline DateTime
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
+
+model StudentProfile {
+  id              String   @id @default(uuid())
+  firstName       String
+  lastName        String
+  email           String?
+  phone           String?
+  highestLevel    StudyLevel
+  marks10th       Float?
+  marks12th       Float?
+  marks12thEnglish Float?
+  gradDegree      String?
+  gradMarks       Float?
+  ieltsOverall    Float?
+  ieltsReading    Float?
+  ieltsWriting    Float?
+  ieltsSpeaking   Float?
+  ieltsListening  Float?
+  experienceMonths Int?
+  backlogs        Int?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  counselorId     String?
+  searchHistory   SearchHistory[]
+}
+
+model SearchHistory {
+  id               String          @id @default(uuid())
+  userId           String
+  user             User            @relation(fields: [userId], references: [id])
+  studentProfileId String?
+  studentProfile   StudentProfile? @relation(fields: [studentProfileId], references: [id])
+  searchParams     Json            // Store the exact parameters searched
+  createdAt        DateTime        @default(now())
+}
+
+model SavedCourse {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  courseId  String
+  course    Course   @relation(fields: [courseId], references: [id])
+  status    EligibilityStatus
+  score     Float
+  createdAt DateTime @default(now())
+
+  @@unique([userId, courseId])
+}
