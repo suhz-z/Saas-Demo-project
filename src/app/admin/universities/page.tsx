@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import { getUniversities, bulkCreateUniversities } from "@/services/university";
 import { UniversityTable } from "@/components/modules/admin/UniversityTable";
 import { UniversityFormDialog } from "@/components/modules/admin/UniversityFormDialog";
@@ -17,17 +16,17 @@ export default async function UniversitiesPage({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight text-gray-900">Universities</h1>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex flex-col gap-1">
+          <h1 className="text-3xl font-bold tracking-tight">Universities</h1>
+          <p className="text-muted-foreground text-[15px]">Manage partner institutions and their details.</p>
+        </div>
         <div className="flex gap-2">
           <BulkUploadDialog type="Universities" onUpload={bulkCreateUniversities} />
           <UniversityFormDialog />
         </div>
       </div>
-
-      <div className="bg-white rounded-lg shadow-sm border p-4">
-        <UniversityTable data={result.data} total={result.total} page={result.page} totalPages={result.totalPages} query={query} />
-      </div>
+      <UniversityTable data={result.data} total={result.total} page={result.page} totalPages={result.totalPages} query={query} />
     </div>
   );
 }

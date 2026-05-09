@@ -55,9 +55,13 @@ export function StudentFormDialog() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger render={<Button className="bg-emerald-600 hover:bg-emerald-700" />}>
-        <Plus size={16} className="mr-2" /> Add Student
-      </DialogTrigger>
+      <DialogTrigger
+        render={
+          <Button size="sm" className="h-9 px-4 rounded-lg bg-primary hover:bg-primary/90 text-[13px] font-medium shadow-sm">
+            <Plus size={15} className="mr-1.5" /> Add Student
+          </Button>
+        }
+      />
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Add New Student Profile</DialogTitle>
@@ -104,7 +108,7 @@ export function StudentFormDialog() {
               )} />
             </div>
             
-            <Button type="submit" className="w-full bg-emerald-600 hover:bg-emerald-700 mt-4">Save Profile</Button>
+            <Button type="submit" size="sm" className="w-full h-9 rounded-lg bg-primary text-[13px] font-medium mt-4">Save Profile</Button>
           </form>
         </Form>
       </DialogContent>

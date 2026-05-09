@@ -61,11 +61,11 @@ export function BulkUploadDialog({ type, onUpload }: { type: "Universities" | "C
     }}>
       <DialogTrigger
         render={
-          <Button variant="outline" className="text-emerald-700 border-emerald-200 hover:bg-emerald-50" />
+          <Button variant="outline" size="sm" className="h-9 px-4 rounded-lg border-border/50 bg-white dark:bg-card text-[13px] font-medium shadow-sm hover:bg-muted/50 text-foreground/80">
+            <UploadCloud size={15} className="mr-1.5" /> Bulk Upload
+          </Button>
         }
-      >
-        <UploadCloud size={16} className="mr-2" /> Bulk Upload
-      </DialogTrigger>
+      />
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>Bulk Upload {type}</DialogTitle>

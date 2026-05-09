@@ -57,9 +57,13 @@ export function CourseFormDialog({ universities }: { universities: { id: string,
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger render={<Button className="bg-emerald-600 hover:bg-emerald-700" />}>
-        <Plus size={16} className="mr-2" /> Add Course
-      </DialogTrigger>
+      <DialogTrigger
+        render={
+          <Button size="sm" className="h-9 px-4 rounded-lg bg-primary hover:bg-primary/90 text-[13px] font-medium shadow-sm">
+            <Plus size={15} className="mr-1.5" /> Add Course
+          </Button>
+        }
+      />
       <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Add New Course</DialogTitle>
