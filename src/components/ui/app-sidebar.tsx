@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useTransition } from "react";
 import { SidebarLink } from "./sidebar-link";
-import { Menu, X, LogOut, ChevronLeft, ChevronRight } from "lucide-react";
+import { Menu, X, LogOut, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
 
@@ -23,6 +23,7 @@ interface AppSidebarProps {
 export function AppSidebar({ links, brand, signOutAction }: AppSidebarProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const pathname = usePathname();
 
   // Close sidebar on mobile when route changes
@@ -106,13 +107,20 @@ export function AppSidebar({ links, brand, signOutAction }: AppSidebarProps) {
         {/* Footer */}
         <div className="px-3 pb-5 mt-auto">
           <div className={cn("mx-2 mb-4 h-px bg-sidebar-border/60 transition-all", isCollapsed && "mx-1")} />
-          <form action={signOutAction}>
-            <button className={cn(
-              "flex items-center gap-2.5 w-full px-3 py-2.5 rounded-lg text-[13px] hover:bg-white/[0.06] text-sidebar-foreground/50 hover:text-sidebar-foreground/80 transition-all duration-150 font-medium",
-              isCollapsed && "justify-center px-0"
-            )}>
-              <LogOut size={16} />
-              {!isCollapsed && <span>Sign out</span>}
+          <form action={() => startTransition(async () => await signOutAction())}>
+            <button 
+              disabled={isPending}
+              className={cn(
+                "flex items-center gap-2.5 w-full px-3 py-2.5 rounded-lg text-[13px] hover:bg-white/[0.06] text-sidebar-foreground/50 hover:text-sidebar-foreground/80 transition-all duration-150 font-medium disabled:opacity-50",
+                isCollapsed && "justify-center px-0"
+              )}
+            >
+              {isPending ? (
+                <Loader2 size={16} className="animate-spin" />
+              ) : (
+                <LogOut size={16} />
+              )}
+              {!isCollapsed && <span>{isPending ? "Signing out..." : "Sign out"}</span>}
             </button>
           </form>
         </div>

@@ -1,207 +1,199 @@
 import { PrismaClient, Role, StudyLevel, EligibilityStatus } from '@prisma/client';
+import { faker } from '@faker-js/faker';
 import * as bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
 async function main() {
-  const adminEmail = 'admin@sacdms.com';
-  const counselorEmail = 'counselor@sacdms.com';
+  console.log('Starting seed...');
+
+  // 1. Clean the database
+  console.log('Cleaning database...');
+  const tablenames = [
+    'SavedCourse', 'SearchHistory', 'EligibilityRule', 'Course', 
+    'University', 'AcademicCycle', 'StudentProfile', 'Domain', 
+    'Country', 'User'
+  ];
+
+  for (const tablename of tablenames) {
+    await prisma.$executeRawUnsafe(`TRUNCATE TABLE "${tablename}" CASCADE;`);
+  }
+
   const passwordHash = await bcrypt.hash('password123', 10);
 
-  // 1. Users
-  await prisma.user.upsert({
-    where: { email: adminEmail },
-    update: {},
-    create: {
-      email: adminEmail,
+  // 2. Create Users
+  console.log('Creating users...');
+  await prisma.user.create({
+    data: {
+      email: 'admin@sacdms.com',
       name: 'System Admin',
       passwordHash,
       role: Role.ADMIN,
-      isActive: true,
     },
   });
 
-  const counselor = await prisma.user.upsert({
-    where: { email: counselorEmail },
-    update: {},
-    create: {
-      email: counselorEmail,
-      name: 'Test Counselor',
-      passwordHash,
-      role: Role.COUNSELOR,
-      isActive: true,
-    },
-  });
+  const counselors = [];
+  for (let i = 1; i <= 10; i++) {
+    const counselor = await prisma.user.create({
+      data: {
+        email: `counselor${i}@sacdms.com`,
+        name: faker.person.fullName(),
+        passwordHash,
+        role: Role.COUNSELOR,
+      },
+    });
+    counselors.push(counselor);
+  }
 
-  // 2. Countries
-  const countries = [
+  // 3. Create Countries
+  console.log('Creating countries...');
+  const countryData = [
     { name: 'United States', code: 'US' },
     { name: 'United Kingdom', code: 'UK' },
     { name: 'Canada', code: 'CA' },
     { name: 'Australia', code: 'AU' },
+    { name: 'Germany', code: 'DE' },
+    { name: 'Ireland', code: 'IE' },
+    { name: 'New Zealand', code: 'NZ' },
+    { name: 'France', code: 'FR' },
+    { name: 'Singapore', code: 'SG' },
+    { name: 'Netherlands', code: 'NL' },
   ];
+  const countries = [];
+  for (const c of countryData) {
+    const country = await prisma.country.create({ data: c });
+    countries.push(country);
+  }
 
-  for (const c of countries) {
-    await prisma.country.upsert({
-      where: { code: c.code },
-      update: {},
-      create: c,
+  // 4. Create Domains
+  console.log('Creating domains...');
+  const domainNames = [
+    'Computer Science', 'Business Administration', 'Data Science', 'Mechanical Engineering',
+    'Nursing', 'Psychology', 'Artificial Intelligence', 'Cyber Security', 'Finance',
+    'Marketing', 'Electrical Engineering', 'Civil Engineering', 'Architecture',
+    'Biotechnology', 'Public Health', 'Law', 'Environmental Science', 'Education'
+  ];
+  const domains = [];
+  for (const name of domainNames) {
+    const domain = await prisma.domain.create({ data: { name } });
+    domains.push(domain);
+  }
+
+  // 5. Create Universities
+  console.log('Creating universities...');
+  const universities = [];
+  for (let i = 0; i < 60; i++) {
+    const country = faker.helpers.arrayElement(countries);
+    const uni = await prisma.university.create({
+      data: {
+        name: `${faker.company.name()} University`,
+        countryId: country.id,
+        city: faker.location.city(),
+        ranking: faker.number.int({ min: 1, max: 1000 }),
+        website: faker.internet.url(),
+        partnerStatus: faker.datatype.boolean(0.3),
+      },
+    });
+    universities.push(uni);
+  }
+
+  // 6. Create Courses & Eligibility Rules
+  console.log('Creating courses...');
+  const studyLevels = [
+    StudyLevel.BACHELORS, StudyLevel.MASTERS, StudyLevel.DIPLOMA,
+    StudyLevel.ADVANCED_DIPLOMA, StudyLevel.PG_DIPLOMA
+  ];
+  const intakes = ['Fall', 'Spring', 'Summer', 'Fall/Spring', 'Rolling'];
+
+  const courseBatch = [];
+  for (let i = 0; i < 400; i++) {
+    const uni = faker.helpers.arrayElement(universities);
+    const domain = faker.helpers.arrayElement(domains);
+    const level = faker.helpers.arrayElement(studyLevels);
+
+    courseBatch.push({
+      name: `${faker.hacker.adjective()} ${domain.name} ${level === StudyLevel.MASTERS ? 'Master' : 'Bachelor'}`,
+      universityId: uni.id,
+      studyLevel: level,
+      domainId: domain.id,
+      degreeType: level === StudyLevel.MASTERS ? 'M.Sc' : level === StudyLevel.BACHELORS ? 'B.Sc' : 'Diploma',
+      duration: level === StudyLevel.MASTERS ? 12 + (faker.number.int({ min: 0, max: 2 }) * 6) : 36 + (faker.number.int({ min: 0, max: 2 }) * 12),
+      tuitionFees: faker.number.float({ min: 10000, max: 60000, fractionDigits: 2 }),
+      currency: uni.countryId === countries.find(c => c.code === 'US')?.id ? 'USD' : uni.countryId === countries.find(c => c.code === 'UK')?.id ? 'GBP' : 'EUR',
+      intake: faker.helpers.arrayElement(intakes),
+      description: faker.lorem.paragraph(),
     });
   }
 
-  // 3. Domains
-  const domains = ['Computer Science', 'Business Administration', 'Data Science', 'Mechanical Engineering', 'Nursing'];
-  for (const d of domains) {
-    await prisma.domain.upsert({
-      where: { name: d },
-      update: {},
-      create: { name: d },
+  // Use createMany if the provider supports it (PostgreSQL does)
+  await prisma.course.createMany({ data: courseBatch });
+
+  console.log('Creating eligibility rules...');
+  const allCourses = await prisma.course.findMany({ select: { id: true, studyLevel: true } });
+  const ruleBatch = allCourses.map(course => ({
+    courseId: course.id,
+    min10thMarks: faker.number.float({ min: 50, max: 90, fractionDigits: 1 }),
+    min12thMarks: faker.number.float({ min: 50, max: 90, fractionDigits: 1 }),
+    minGradMarks: course.studyLevel === StudyLevel.MASTERS || course.studyLevel === StudyLevel.PG_DIPLOMA ? faker.number.float({ min: 2.0, max: 4.0, fractionDigits: 1 }) : null,
+    minIeltsOverall: faker.helpers.arrayElement([6.0, 6.5, 7.0, 7.5]),
+    minIeltsReading: 6.0,
+    minIeltsWriting: 6.0,
+    minIeltsSpeaking: 6.0,
+    minIeltsListening: 6.0,
+    minExperience: faker.datatype.boolean(0.2) ? faker.number.int({ min: 12, max: 36 }) : 0,
+    maxBacklogs: faker.number.int({ min: 0, max: 10 }),
+  }));
+
+  await prisma.eligibilityRule.createMany({ data: ruleBatch });
+
+  // 7. Academic Cycles
+  console.log('Creating academic cycles...');
+  const years = [2024, 2025, 2026];
+  const intakeNames = ['September', 'January', 'May'];
+  for (const year of years) {
+    for (let j = 0; j < intakeNames.length; j++) {
+      await prisma.academicCycle.create({
+        data: {
+          intakeName: intakeNames[j],
+          year: year,
+          month: j === 0 ? 9 : j === 1 ? 1 : 5,
+          applicationDeadline: new Date(`${year}-${j === 0 ? '07-01' : j === 1 ? '11-01' : '03-01'}`),
+        },
+      });
+    }
+  }
+
+  // 8. Student Profiles
+  console.log('Creating student profiles...');
+  for (let i = 0; i < 400; i++) {
+    const counselor = faker.helpers.arrayElement(counselors);
+    const level = faker.helpers.arrayElement(studyLevels);
+
+    await prisma.studentProfile.create({
+      data: {
+        firstName: faker.person.firstName(),
+        lastName: faker.person.lastName(),
+        email: faker.internet.email(),
+        phone: faker.phone.number(),
+        highestLevel: level,
+        marks10th: faker.number.float({ min: 60, max: 98, fractionDigits: 1 }),
+        marks12th: faker.number.float({ min: 60, max: 98, fractionDigits: 1 }),
+        marks12thEnglish: faker.number.float({ min: 60, max: 98, fractionDigits: 1 }),
+        gradMarks: level === StudyLevel.BACHELORS || level === StudyLevel.MASTERS ? faker.number.float({ min: 2.5, max: 4.0, fractionDigits: 1 }) : null,
+        gradDegree: level === StudyLevel.BACHELORS || level === StudyLevel.MASTERS ? faker.helpers.arrayElement(['B.Tech', 'B.Sc', 'B.Com', 'B.A']) : null,
+        ieltsOverall: faker.helpers.arrayElement([6.0, 6.5, 7.0, 7.5, 8.0]),
+        ieltsReading: 6.5,
+        ieltsWriting: 6.0,
+        ieltsSpeaking: 6.5,
+        ieltsListening: 7.0,
+        experienceMonths: faker.number.int({ min: 0, max: 60 }),
+        backlogs: faker.number.int({ min: 0, max: 5 }),
+        counselorId: counselor.id,
+      },
     });
   }
 
-  const us = await prisma.country.findUnique({ where: { code: 'US' } });
-  const uk = await prisma.country.findUnique({ where: { code: 'UK' } });
-  const ca = await prisma.country.findUnique({ where: { code: 'CA' } });
-
-  const csDomain = await prisma.domain.findUnique({ where: { name: 'Computer Science' } });
-  const businessDomain = await prisma.domain.findUnique({ where: { name: 'Business Administration' } });
-
-  // 4. Universities
-  if (us && uk && ca) {
-    const unisToCreate = [
-      {
-        name: 'Harvard University',
-        countryId: us.id,
-        city: 'Cambridge',
-        ranking: 1,
-        website: 'https://harvard.edu',
-        partnerStatus: true,
-      },
-      {
-        name: 'Massachusetts Institute of Technology',
-        countryId: us.id,
-        city: 'Cambridge',
-        ranking: 2,
-        website: 'https://mit.edu',
-        partnerStatus: false,
-      },
-      {
-        name: 'University of Oxford',
-        countryId: uk.id,
-        city: 'Oxford',
-        ranking: 3,
-        website: 'https://ox.ac.uk',
-        partnerStatus: true,
-      },
-      {
-        name: 'University of Toronto',
-        countryId: ca.id,
-        city: 'Toronto',
-        ranking: 21,
-        website: 'https://utoronto.ca',
-        partnerStatus: true,
-      }
-    ];
-
-    for (const u of unisToCreate) {
-      const exists = await prisma.university.findFirst({ where: { name: u.name } });
-      if (!exists) {
-        await prisma.university.create({ data: u });
-      }
-    }
-  }
-
-  // 5. Courses
-  const harvard = await prisma.university.findFirst({ where: { name: 'Harvard University' } });
-  const oxford = await prisma.university.findFirst({ where: { name: 'University of Oxford' } });
-  
-  if (harvard && oxford && csDomain && businessDomain) {
-    const coursesToCreate = [
-      {
-        name: 'B.Sc Computer Science',
-        universityId: harvard.id,
-        studyLevel: StudyLevel.BACHELORS,
-        domainId: csDomain.id,
-        degreeType: 'Bachelor of Science',
-        duration: 48,
-        tuitionFees: 54000,
-        currency: 'USD',
-        intake: 'Fall',
-      },
-      {
-        name: 'MBA Business Administration',
-        universityId: harvard.id,
-        studyLevel: StudyLevel.MASTERS,
-        domainId: businessDomain.id,
-        degreeType: 'Master of Business Administration',
-        duration: 24,
-        tuitionFees: 73000,
-        currency: 'USD',
-        intake: 'Fall/Spring',
-      },
-      {
-        name: 'M.Sc Data Science',
-        universityId: oxford.id,
-        studyLevel: StudyLevel.MASTERS,
-        domainId: csDomain.id,
-        degreeType: 'Master of Science',
-        duration: 12,
-        tuitionFees: 32000,
-        currency: 'GBP',
-        intake: 'Fall',
-      }
-    ];
-
-    for (const c of coursesToCreate) {
-      const exists = await prisma.course.findFirst({ where: { name: c.name, universityId: c.universityId } });
-      if (!exists) {
-        await prisma.course.create({ data: c });
-      }
-    }
-  }
-
-  // 6. Students
-  const studentsToCreate = [
-    {
-      firstName: 'Alice',
-      lastName: 'Smith',
-      email: 'alice.smith@example.com',
-      phone: '+1 555-0100',
-      highestLevel: StudyLevel.BACHELORS,
-      gradMarks: 3.8,
-      ieltsOverall: 7.5,
-      counselorId: counselor.id
-    },
-    {
-      firstName: 'Bob',
-      lastName: 'Jones',
-      email: 'bob.jones@example.com',
-      phone: '+44 7700 900000',
-      highestLevel: StudyLevel.DIPLOMA,
-      marks12th: 85.5,
-      ieltsOverall: 6.5,
-      counselorId: counselor.id
-    },
-    {
-      firstName: 'Charlie',
-      lastName: 'Brown',
-      email: 'charlie.b@example.com',
-      phone: '+61 400 000 000',
-      highestLevel: StudyLevel.MASTERS,
-      gradMarks: 3.2,
-      ieltsOverall: 7.0,
-      counselorId: counselor.id
-    }
-  ];
-
-  for (const s of studentsToCreate) {
-    const exists = await prisma.studentProfile.findFirst({ where: { email: s.email } });
-    if (!exists) {
-      await prisma.studentProfile.create({ data: s });
-    }
-  }
-
-  console.log('Seeding complete! Data generated.');
+  console.log('Seed completed successfully!');
 }
 
 main()
