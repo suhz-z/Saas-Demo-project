@@ -10,6 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { deleteUser, updateUserStatus } from "@/services/user";
 import { motion, AnimatePresence } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
+import { Pagination } from "@/components/shared/Pagination";
 
 type UserRow = {
   id: string;
@@ -166,42 +167,11 @@ export function UserTable({ data, total, page, totalPages, query, children }: Us
         </Table>
       </div>
 
-      {/* Pagination */}
       <div className="flex items-center justify-between">
         <span className="text-[13px] text-muted-foreground">
           {data.length} of {total} users
         </span>
-        <div className="flex items-center gap-1">
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={page <= 1}
-            onClick={() => router.push(`/admin/users?q=${encodeURIComponent(query)}&page=${page - 1}`)}
-            className="h-8 rounded-lg text-[12px] px-3"
-          >
-            Previous
-          </Button>
-          {[...Array(totalPages)].map((_, i) => (
-            <Button
-              key={i}
-              variant={page === i + 1 ? "default" : "ghost"}
-              size="sm"
-              className={`h-8 w-8 rounded-lg text-[12px] ${page === i + 1 ? "shadow-sm" : ""}`}
-              onClick={() => router.push(`/admin/users?q=${encodeURIComponent(query)}&page=${i + 1}`)}
-            >
-              {i + 1}
-            </Button>
-          ))}
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={page >= totalPages}
-            onClick={() => router.push(`/admin/users?q=${encodeURIComponent(query)}&page=${page + 1}`)}
-            className="h-8 rounded-lg text-[12px] px-3"
-          >
-            Next
-          </Button>
-        </div>
+        <Pagination page={page} totalPages={totalPages} baseUrl="/admin/users" />
       </div>
     </div>
   );
