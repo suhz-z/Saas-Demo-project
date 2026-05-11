@@ -1,27 +1,34 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 
-export async function getUniversities(search?: string, page = 1, limit = 10) {
-  const skip = (page - 1) * limit;
-  const where = search
-    ? { name: { contains: search, mode: "insensitive" as const } }
-    : {};
+import { unstable_cache } from "next/cache";
 
-  const [data, total] = await Promise.all([
-    prisma.university.findMany({
-      where,
-      include: { country: true },
-      skip,
-      take: limit,
-      orderBy: { createdAt: "desc" },
-    }),
-    prisma.university.count({ where }),
-  ]);
+export const getUniversities = unstable_cache(
+  async (search?: string, page = 1, limit = 10) => {
+    const skip = (page - 1) * limit;
+    const where = search
+      ? { name: { contains: search, mode: "insensitive" as const } }
+      : {};
 
-  return { data, total, page, totalPages: Math.ceil(total / limit) };
-}
+    const [data, total] = await Promise.all([
+      prisma.university.findMany({
+        where,
+        include: { country: true },
+        skip,
+        take: limit,
+        orderBy: { createdAt: "desc" },
+      }),
+      prisma.university.count({ where }),
+    ]);
+
+    return { data, total, page, totalPages: Math.ceil(total / limit) };
+  },
+  ["universities-list"],
+  { tags: ["universities"], revalidate: 60 } // Cache for 60 seconds and tag for revalidation
+);
+
 
 export async function createUniversity(data: {
   name: string;
@@ -52,12 +59,14 @@ export async function createUniversity(data: {
   });
 
   revalidatePath("/admin/universities");
+  revalidateTag("universities");
   return uni;
 }
 
 export async function deleteUniversity(id: string) {
   await prisma.university.delete({ where: { id } });
   revalidatePath("/admin/universities");
+  revalidateTag("universities");
 }
 
 export async function bulkCreateUniversities(records: any[]) {
@@ -141,6 +150,7 @@ export async function bulkCreateUniversities(records: any[]) {
   }
 
   revalidatePath("/admin/universities");
+  revalidateTag("universities");
 
   return {
     success: errors.length === 0,

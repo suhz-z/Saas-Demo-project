@@ -1,27 +1,32 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
+import { unstable_cache } from "next/cache";
 
-export async function getCourses(search?: string, page = 1, limit = 10) {
-  const skip = (page - 1) * limit;
-  const where = search
-    ? { name: { contains: search, mode: "insensitive" as const } }
-    : {};
+export const getCourses = unstable_cache(
+  async (search?: string, page = 1, limit = 10) => {
+    const skip = (page - 1) * limit;
+    const where = search
+      ? { name: { contains: search, mode: "insensitive" as const } }
+      : {};
 
-  const [data, total] = await Promise.all([
-    prisma.course.findMany({
-      where,
-      include: { university: true, domain: true },
-      skip,
-      take: limit,
-      orderBy: { createdAt: "desc" },
-    }),
-    prisma.course.count({ where }),
-  ]);
+    const [data, total] = await Promise.all([
+      prisma.course.findMany({
+        where,
+        include: { university: true, domain: true },
+        skip,
+        take: limit,
+        orderBy: { createdAt: "desc" },
+      }),
+      prisma.course.count({ where }),
+    ]);
 
-  return { data, total, page, totalPages: Math.ceil(total / limit) };
-}
+    return { data, total, page, totalPages: Math.ceil(total / limit) };
+  },
+  ["courses-list"],
+  { tags: ["courses"], revalidate: 60 }
+);
 
 export async function createCourse(data: {
   name: string;
@@ -57,20 +62,26 @@ export async function createCourse(data: {
   });
 
   revalidatePath("/admin/courses");
+  revalidateTag("courses");
   return course;
 }
 
 export async function deleteCourse(id: string) {
   await prisma.course.delete({ where: { id } });
   revalidatePath("/admin/courses");
+  revalidateTag("courses");
 }
 
-export async function getUniversityOptions() {
-  return await prisma.university.findMany({
-    select: { id: true, name: true },
-    orderBy: { name: "asc" }
-  });
-}
+export const getUniversityOptions = unstable_cache(
+  async () => {
+    return await prisma.university.findMany({
+      select: { id: true, name: true },
+      orderBy: { name: "asc" }
+    });
+  },
+  ["university-options"],
+  { tags: ["universities"], revalidate: 3600 }
+);
 
 export async function bulkCreateCourses(records: any[]) {
   if (!records || records.length === 0) {
@@ -187,6 +198,7 @@ export async function bulkCreateCourses(records: any[]) {
   }
 
   revalidatePath("/admin/courses");
+  revalidateTag("courses");
 
   return {
     success: errors.length === 0,
