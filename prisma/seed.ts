@@ -32,9 +32,18 @@ async function main() {
     },
   });
 
-  const counselors = [];
+  const counselor = await prisma.user.create({
+    data: {
+      email: 'counselor@sacdms.com',
+      name: 'Test Counselor',
+      passwordHash,
+      role: Role.COUNSELOR,
+    },
+  });
+
+  const counselors = [counselor];
   for (let i = 1; i <= 10; i++) {
-    const counselor = await prisma.user.create({
+    const c = await prisma.user.create({
       data: {
         email: `counselor${i}@sacdms.com`,
         name: faker.person.fullName(),
@@ -42,7 +51,7 @@ async function main() {
         role: Role.COUNSELOR,
       },
     });
-    counselors.push(counselor);
+    counselors.push(c);
   }
 
   // 3. Create Countries

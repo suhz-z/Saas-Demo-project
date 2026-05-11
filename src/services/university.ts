@@ -59,14 +59,14 @@ export async function createUniversity(data: {
   });
 
   revalidatePath("/admin/universities");
-  revalidateTag("universities");
+  revalidateTag("universities", "max");
   return uni;
 }
 
 export async function deleteUniversity(id: string) {
   await prisma.university.delete({ where: { id } });
   revalidatePath("/admin/universities");
-  revalidateTag("universities");
+  revalidateTag("universities", "max");
 }
 
 export async function bulkCreateUniversities(records: any[]) {
@@ -150,7 +150,7 @@ export async function bulkCreateUniversities(records: any[]) {
   }
 
   revalidatePath("/admin/universities");
-  revalidateTag("universities");
+  revalidateTag("universities", "max");
 
   return {
     success: errors.length === 0,

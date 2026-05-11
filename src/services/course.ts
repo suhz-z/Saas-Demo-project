@@ -62,14 +62,14 @@ export async function createCourse(data: {
   });
 
   revalidatePath("/admin/courses");
-  revalidateTag("courses");
+  revalidateTag("courses", "max");
   return course;
 }
 
 export async function deleteCourse(id: string) {
   await prisma.course.delete({ where: { id } });
   revalidatePath("/admin/courses");
-  revalidateTag("courses");
+  revalidateTag("courses", "max");
 }
 
 export const getUniversityOptions = unstable_cache(
@@ -198,7 +198,7 @@ export async function bulkCreateCourses(records: any[]) {
   }
 
   revalidatePath("/admin/courses");
-  revalidateTag("courses");
+  revalidateTag("courses", "max");
 
   return {
     success: errors.length === 0,

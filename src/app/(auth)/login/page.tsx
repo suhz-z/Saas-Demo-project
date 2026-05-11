@@ -66,7 +66,7 @@ export default function LoginPage() {
         <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay"></div>
         <div className="absolute top-[-20%] left-[-10%] w-[70%] h-[70%] rounded-full bg-primary/20 blur-[120px]" />
         <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] rounded-full bg-blue-500/20 blur-[120px]" />
-        
+
         <div className="absolute inset-0 subtle-grid opacity-[0.05]" />
 
         <motion.div
@@ -205,7 +205,7 @@ export default function LoginPage() {
               </div>
               <div className="p-2.5 rounded-lg bg-muted/30 border border-border/50">
                 <p className="text-[11px] font-bold text-foreground mb-0.5">Counselor</p>
-                <p className="text-[11px] text-muted-foreground truncate">counselor@sacdms.com</p>
+                <p className="text-[11px] text-muted-foreground truncate">counselor1@sacdms.com</p>
                 <p className="text-[10px] text-primary font-medium mt-1">password123</p>
               </div>
             </div>
