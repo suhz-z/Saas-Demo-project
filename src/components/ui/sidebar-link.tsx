@@ -8,9 +8,10 @@ interface SidebarLinkProps {
   href: string;
   icon: React.ReactNode;
   label: string;
+  className?: string;
 }
 
-export function SidebarLink({ href, icon, label }: SidebarLinkProps) {
+export function SidebarLink({ href, icon, label, className }: SidebarLinkProps) {
   const pathname = usePathname();
   const isActive = pathname === href || pathname.startsWith(`${href}/`);
 
@@ -21,22 +22,24 @@ export function SidebarLink({ href, icon, label }: SidebarLinkProps) {
   return (
     <Link
       href={href}
+      title={label}
       className={cn(
         "flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-[13px] transition-all duration-150 group font-medium",
         finalIsActive
           ? "bg-primary/10 text-primary"
-          : "hover:bg-sidebar-accent text-sidebar-foreground/70 hover:text-sidebar-foreground"
+          : "hover:bg-sidebar-accent text-sidebar-foreground/70 hover:text-sidebar-foreground",
+        className
       )}
     >
       <span
         className={cn(
-          "transition-colors",
+          "transition-colors shrink-0",
           finalIsActive ? "text-primary" : "text-sidebar-foreground/50 group-hover:text-primary"
         )}
       >
         {icon}
       </span>
-      {label}
+      {label && <span className="truncate animate-in fade-in slide-in-from-left-1 duration-300">{label}</span>}
     </Link>
   );
 }

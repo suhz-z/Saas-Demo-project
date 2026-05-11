@@ -1,56 +1,40 @@
 import { ReactNode } from "react";
-import { SidebarLink } from "@/components/ui/sidebar-link";
-import { LayoutDashboard, Building2, BookOpen, Users, LogOut, CalendarDays } from "lucide-react";
+import { LayoutDashboard, Building2, BookOpen, Users, CalendarDays } from "lucide-react";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { AppSidebar } from "@/components/ui/app-sidebar";
 
 export default async function AdminLayout({ children }: { children: ReactNode }) {
+  async function signOut() {
+    "use server";
+    const c = await cookies();
+    c.delete("auth_token");
+    redirect("/login");
+  }
+
+  const links = [
+    { href: "/admin", icon: <LayoutDashboard size={17} />, label: "Dashboard" },
+    { href: "/admin/universities", icon: <Building2 size={17} />, label: "Universities" },
+    { href: "/admin/courses", icon: <BookOpen size={17} />, label: "Courses" },
+    { href: "/admin/intakes", icon: <CalendarDays size={17} />, label: "Academic Cycles" },
+    { href: "/admin/users", icon: <Users size={17} />, label: "Users" },
+  ];
+
+  const brand = {
+    initials: "SA",
+    name: "SACDMS",
+    role: "Admin",
+  };
+
   return (
-    <div className="flex h-screen bg-background subtle-grid">
-      <aside className="w-[17rem] bg-sidebar text-sidebar-foreground flex flex-col border-r border-sidebar-border relative z-20">
-        {/* Brand */}
-        <div className="px-6 py-7 flex items-center gap-3.5">
-          <div className="bg-primary/90 shadow-lg shadow-primary/25 w-9 h-9 rounded-[10px] flex items-center justify-center text-[13px] font-extrabold text-white tracking-tight">
-            SA
-          </div>
-          <div className="flex flex-col gap-0.5">
-            <span className="text-[15px] font-bold tracking-tight text-white leading-none">SACDMS</span>
-            <span className="text-[10px] uppercase tracking-[0.12em] text-sidebar-foreground/40 font-semibold leading-none">Admin</span>
-          </div>
-        </div>
+    <div className="flex h-screen bg-background subtle-grid overflow-hidden">
+      <AppSidebar links={links} brand={brand} signOutAction={signOut} />
 
-        {/* Divider */}
-        <div className="mx-5 h-px bg-sidebar-border/60" />
-
-        {/* Navigation */}
-        <nav className="flex-1 px-3 py-5 space-y-0.5">
-          <SidebarLink href="/admin" icon={<LayoutDashboard size={17} />} label="Dashboard" />
-          <SidebarLink href="/admin/universities" icon={<Building2 size={17} />} label="Universities" />
-          <SidebarLink href="/admin/courses" icon={<BookOpen size={17} />} label="Courses" />
-          <SidebarLink href="/admin/intakes" icon={<CalendarDays size={17} />} label="Academic Cycles" />
-          <SidebarLink href="/admin/users" icon={<Users size={17} />} label="Users" />
-        </nav>
-
-        {/* Footer */}
-        <div className="px-3 pb-5 mt-auto">
-          <div className="mx-2 mb-4 h-px bg-sidebar-border/60" />
-          <form action={async () => {
-            "use server";
-            const c = await cookies();
-            c.delete("auth_token");
-            redirect("/login");
-          }}>
-            <button className="flex items-center gap-2.5 w-full px-3 py-2.5 rounded-lg text-[13px] hover:bg-white/[0.06] text-sidebar-foreground/50 hover:text-sidebar-foreground/80 transition-all duration-150 font-medium">
-              <LogOut size={16} />
-              Sign out
-            </button>
-          </form>
-        </div>
-      </aside>
-
-      <main className="flex-1 flex flex-col overflow-hidden">
-        <header className="bg-background/80 backdrop-blur-xl border-b border-border/40 h-[3.75rem] flex items-center justify-between px-8 shrink-0">
+      <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        <header className="bg-background/80 backdrop-blur-xl border-b border-border/40 h-[3.75rem] flex items-center justify-between px-4 md:px-8 shrink-0">
           <div className="flex items-center gap-3">
+            {/* Spacer for mobile toggle button */}
+            <div className="w-10 md:hidden" />
             <h2 className="text-[15px] font-semibold tracking-tight text-foreground/80">Admin Portal</h2>
           </div>
           <div className="flex items-center gap-3">
@@ -59,7 +43,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
             </div>
           </div>
         </header>
-        <div className="flex-1 overflow-auto p-8 custom-scrollbar">
+        <div className="flex-1 overflow-auto p-4 md:p-8 custom-scrollbar">
           <div className="max-w-[76rem] mx-auto">
             {children}
           </div>
