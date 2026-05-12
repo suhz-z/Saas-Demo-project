@@ -9,7 +9,7 @@ export function SearchSkeleton() {
         <Skeleton className="h-5 w-96" />
       </div>
 
-      <Card className="border-border/40 shadow-sm bg-white/50 backdrop-blur-sm">
+      <Card className="border-border/40 shadow-sm">
         <CardContent className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[...Array(6)].map((_, i) => (

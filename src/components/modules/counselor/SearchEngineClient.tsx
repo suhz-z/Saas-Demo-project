@@ -83,7 +83,7 @@ export function SearchEngineClient({ domains, userId }: { domains: { id: string,
 
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
         {/* Search Panel */}
-        <Card className="xl:col-span-4 border border-border/50 shadow-sm bg-white dark:bg-card overflow-hidden sticky top-20">
+        <Card className="xl:col-span-4 border border-[oklch(0.24_0.035_272_/_0.65)] overflow-hidden sticky top-20" style={{ background: "linear-gradient(145deg, oklch(0.11 0.022 272 / 0.85), oklch(0.09 0.018 275 / 0.8))", backdropFilter: "blur(20px)" }}>
           {/* Step Indicator */}
           <div className="px-6 pt-5 pb-4 border-b border-border/40">
             <div className="flex items-center gap-3 mb-4">
@@ -274,7 +274,7 @@ export function SearchEngineClient({ domains, userId }: { domains: { id: string,
         {/* Results */}
         <div className="xl:col-span-8 space-y-5">
           {!searched ? (
-            <div className="h-[420px] rounded-xl border border-dashed border-border/50 flex flex-col items-center justify-center text-muted-foreground bg-white/50 dark:bg-card/50 gap-3">
+            <div className="h-[420px] rounded-xl border border-dashed flex flex-col items-center justify-center gap-3" style={{ borderColor: "oklch(0.28 0.04 272 / 0.5)", background: "oklch(0.09 0.018 272 / 0.4)", color: "oklch(0.45 0.03 270)" }}>
               <Search size={36} className="opacity-10" />
               <div className="text-center">
                 <p className="text-[15px] font-semibold text-foreground/70">Ready to search</p>
@@ -285,7 +285,7 @@ export function SearchEngineClient({ domains, userId }: { domains: { id: string,
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="h-[420px] rounded-xl border border-border flex flex-col items-center justify-center text-muted-foreground bg-white dark:bg-card"
+              className="h-[420px] rounded-xl border flex flex-col items-center justify-center gap-3" style={{ borderColor: "oklch(0.24 0.035 272 / 0.5)", background: "oklch(0.09 0.018 272 / 0.4)", color: "oklch(0.45 0.03 270)" }}
             >
               <AlertCircle size={36} className="mb-3 text-rose-400/50" />
               <p className="text-[15px] font-semibold text-foreground">No matches found</p>
@@ -307,7 +307,7 @@ export function SearchEngineClient({ domains, userId }: { domains: { id: string,
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: idx * 0.05 }}
                   >
-                    <Card className="border border-border/50 shadow-sm hover:shadow-md transition-all bg-white dark:bg-card group">
+                    <Card className="border border-[oklch(0.26_0.04_272_/_0.6)] hover:border-[oklch(0.68_0.22_290_/_0.3)] transition-all group cursor-pointer" style={{ background: "linear-gradient(145deg, oklch(0.11 0.022 272 / 0.8), oklch(0.09 0.018 275 / 0.75))", backdropFilter: "blur(16px)" }}>
                       <CardContent className="p-5">
                         <div className="flex flex-col md:flex-row gap-5">
                           {/* Score */}

@@ -4,11 +4,11 @@ import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Download, Trash2, FileText, AlertCircle, Loader2 } from "lucide-react";
+import { Download, Trash2, FileText, AlertCircle, Loader2, Search, BookOpen } from "lucide-react";
 import { removeSavedCourse } from "@/services/shortlist";
+import Link from "next/link";
 
 export function SavedCoursesClient({ courses }: { courses: any[] }) {
-  const [loading, setLoading] = useState(false);
   const [exporting, setExporting] = useState<string | null>(null);
 
   const handleDelete = async (courseId: string) => {
@@ -25,9 +25,7 @@ export function SavedCoursesClient({ courses }: { courses: any[] }) {
   const handleExportPDF = async () => {
     setExporting("pdf");
     try {
-      const response = await fetch("/api/export/pdf", {
-        method: "POST",
-      });
+      const response = await fetch("/api/export/pdf", { method: "POST" });
       if (response.ok) {
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);
@@ -52,9 +50,7 @@ export function SavedCoursesClient({ courses }: { courses: any[] }) {
   const handleExportExcel = async () => {
     setExporting("excel");
     try {
-      const response = await fetch("/api/export/excel", {
-        method: "POST",
-      });
+      const response = await fetch("/api/export/excel", { method: "POST" });
       if (response.ok) {
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);
@@ -79,11 +75,26 @@ export function SavedCoursesClient({ courses }: { courses: any[] }) {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "ELIGIBLE":
-        return <span className="bg-emerald-100 text-emerald-800 px-2 py-1 rounded text-xs font-bold">Eligible ✅</span>;
+        return (
+          <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full"
+            style={{ color: "oklch(0.65 0.18 160)", background: "oklch(0.65 0.18 160 / 0.12)", border: "1px solid oklch(0.65 0.18 160 / 0.25)" }}>
+            ✓ Eligible
+          </span>
+        );
       case "BORDERLINE":
-        return <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs font-bold">Borderline ⚠️</span>;
+        return (
+          <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full"
+            style={{ color: "oklch(0.72 0.18 80)", background: "oklch(0.72 0.18 80 / 0.12)", border: "1px solid oklch(0.72 0.18 80 / 0.25)" }}>
+            ⚠ Borderline
+          </span>
+        );
       case "NOT_ELIGIBLE":
-        return <span className="bg-red-100 text-red-800 px-2 py-1 rounded text-xs font-bold">Not Eligible ❌</span>;
+        return (
+          <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full"
+            style={{ color: "oklch(0.60 0.22 27)", background: "oklch(0.60 0.22 27 / 0.12)", border: "1px solid oklch(0.60 0.22 27 / 0.25)" }}>
+            ✕ Not Eligible
+          </span>
+        );
       default:
         return null;
     }
@@ -91,132 +102,186 @@ export function SavedCoursesClient({ courses }: { courses: any[] }) {
 
   if (courses.length === 0) {
     return (
-      <Card>
-        <CardContent className="flex flex-col items-center justify-center py-12">
-          <AlertCircle className="h-12 w-12 text-gray-300 mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-1">No Saved Courses</h3>
-          <p className="text-gray-500 text-center">You haven't saved any courses yet. Go to the search page to find and save matching courses.</p>
-          <Button className="mt-4 bg-emerald-600 hover:bg-emerald-700">
-            <a href="/counselor/search">Search Courses</a>
-          </Button>
-        </CardContent>
-      </Card>
+      <div
+        className="rounded-2xl p-12 flex flex-col items-center justify-center text-center gap-4"
+        style={{
+          background: "linear-gradient(145deg, oklch(0.11 0.022 272 / 0.75), oklch(0.09 0.018 275 / 0.65))",
+          border: "1px solid oklch(0.24 0.035 272 / 0.65)",
+          backdropFilter: "blur(20px)",
+        }}
+      >
+        <div
+          className="w-14 h-14 rounded-2xl flex items-center justify-center"
+          style={{ background: "oklch(0.68 0.22 290 / 0.12)", border: "1px solid oklch(0.68 0.22 290 / 0.2)", color: "oklch(0.68 0.22 290)" }}
+        >
+          <BookOpen size={24} />
+        </div>
+        <div>
+          <h3 className="text-[16px] font-bold mb-1" style={{ color: "oklch(0.88 0.012 268)" }}>No Saved Courses</h3>
+          <p className="text-[13px]" style={{ color: "oklch(0.45 0.03 270)" }}>
+            You haven't saved any courses yet. Go to the search page to find and save matching courses.
+          </p>
+        </div>
+        <Link
+          href="/counselor/search"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-[13px] font-semibold text-white transition-all"
+          style={{
+            background: "linear-gradient(135deg, oklch(0.65 0.22 290), oklch(0.58 0.22 260))",
+            boxShadow: "0 0 20px oklch(0.68 0.22 290 / 0.3)",
+          }}
+        >
+          <Search size={14} /> Search Courses
+        </Link>
+      </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Export Buttons */}
-      <Card>
-        <CardContent className="p-4 flex gap-2">
-          <Button
-            onClick={handleExportPDF}
-            disabled={exporting !== null || courses.length === 0}
-            className="flex items-center gap-2"
-            variant="outline"
-          >
-            {exporting === "pdf" ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Generating PDF...
-              </>
-            ) : (
-              <>
-                <FileText size={16} />
-                Export as PDF
-              </>
-            )}
-          </Button>
-          <Button
-            onClick={handleExportExcel}
-            disabled={exporting !== null || courses.length === 0}
-            className="flex items-center gap-2"
-            variant="outline"
-          >
-            {exporting === "excel" ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Generating Excel...
-              </>
-            ) : (
-              <>
-                <Download size={16} />
-                Export as Excel
-              </>
-            )}
-          </Button>
-        </CardContent>
-      </Card>
+      <div
+        className="rounded-2xl p-4 flex gap-2.5"
+        style={{
+          background: "linear-gradient(145deg, oklch(0.11 0.022 272 / 0.75), oklch(0.09 0.018 275 / 0.65))",
+          border: "1px solid oklch(0.24 0.035 272 / 0.65)",
+          backdropFilter: "blur(20px)",
+        }}
+      >
+        <Button
+          onClick={handleExportPDF}
+          disabled={exporting !== null || courses.length === 0}
+          variant="outline"
+          className="flex items-center gap-2 rounded-xl text-[13px] font-medium"
+          style={{
+            background: "oklch(0.09 0.018 272 / 0.6)",
+            border: "1px solid oklch(0.28 0.04 272 / 0.7)",
+            color: "oklch(0.75 0.02 268)",
+          }}
+        >
+          {exporting === "pdf" ? (
+            <><Loader2 className="h-4 w-4 animate-spin" />Generating PDF...</>
+          ) : (
+            <><FileText size={15} />Export as PDF</>
+          )}
+        </Button>
+        <Button
+          onClick={handleExportExcel}
+          disabled={exporting !== null || courses.length === 0}
+          variant="outline"
+          className="flex items-center gap-2 rounded-xl text-[13px] font-medium"
+          style={{
+            background: "oklch(0.09 0.018 272 / 0.6)",
+            border: "1px solid oklch(0.28 0.04 272 / 0.7)",
+            color: "oklch(0.75 0.02 268)",
+          }}
+        >
+          {exporting === "excel" ? (
+            <><Loader2 className="h-4 w-4 animate-spin" />Generating Excel...</>
+          ) : (
+            <><Download size={15} />Export as Excel</>
+          )}
+        </Button>
+      </div>
 
       {/* Courses Table */}
-      <Card>
-        <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Course Name</TableHead>
-                <TableHead>University</TableHead>
-                <TableHead>Country</TableHead>
-                <TableHead>Study Level</TableHead>
-                <TableHead>Duration</TableHead>
-                <TableHead>Fees</TableHead>
-                <TableHead>Match Score</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Action</TableHead>
+      <div
+        className="rounded-2xl overflow-hidden relative"
+        style={{
+          background: "linear-gradient(145deg, oklch(0.11 0.022 272 / 0.75), oklch(0.09 0.018 275 / 0.65))",
+          border: "1px solid oklch(0.24 0.035 272 / 0.65)",
+          backdropFilter: "blur(20px)",
+          boxShadow: "0 4px 24px oklch(0 0 0 / 0.25), inset 0 1px 0 oklch(1 0 0 / 0.03)",
+        }}
+      >
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="py-3 text-[11px] font-semibold uppercase tracking-wider px-4">Course Name</TableHead>
+              <TableHead className="py-3 text-[11px] font-semibold uppercase tracking-wider">University</TableHead>
+              <TableHead className="py-3 text-[11px] font-semibold uppercase tracking-wider">Country</TableHead>
+              <TableHead className="py-3 text-[11px] font-semibold uppercase tracking-wider">Level</TableHead>
+              <TableHead className="py-3 text-[11px] font-semibold uppercase tracking-wider">Duration</TableHead>
+              <TableHead className="py-3 text-[11px] font-semibold uppercase tracking-wider">Fees</TableHead>
+              <TableHead className="py-3 text-[11px] font-semibold uppercase tracking-wider">Match</TableHead>
+              <TableHead className="py-3 text-[11px] font-semibold uppercase tracking-wider">Status</TableHead>
+              <TableHead className="py-3 text-[11px] font-semibold uppercase tracking-wider text-right">Action</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {courses.map((saved) => (
+              <TableRow key={saved.id} className="group">
+                <TableCell className="font-semibold py-3.5 px-4" style={{ color: "oklch(0.88 0.012 268)" }}>
+                  {saved.course.name}
+                </TableCell>
+                <TableCell className="py-3.5" style={{ color: "oklch(0.68 0.015 268)" }}>
+                  {saved.course.university.name}
+                </TableCell>
+                <TableCell className="py-3.5" style={{ color: "oklch(0.60 0.015 268)" }}>
+                  {saved.course.university.country.name}
+                </TableCell>
+                <TableCell className="py-3.5" style={{ color: "oklch(0.60 0.015 268)" }}>
+                  {saved.course.studyLevel.replace("_", " ")}
+                </TableCell>
+                <TableCell className="py-3.5" style={{ color: "oklch(0.60 0.015 268)" }}>
+                  {saved.course.duration} mo
+                </TableCell>
+                <TableCell className="py-3.5" style={{ color: "oklch(0.60 0.015 268)" }}>
+                  {saved.course.currency} {saved.course.tuitionFees.toLocaleString()}
+                </TableCell>
+                <TableCell className="py-3.5">
+                  <span className="font-bold text-[13px]" style={{ color: "oklch(0.68 0.22 290)" }}>
+                    {saved.score.toFixed(0)}%
+                  </span>
+                </TableCell>
+                <TableCell className="py-3.5">
+                  {getStatusBadge(saved.status)}
+                </TableCell>
+                <TableCell className="py-3.5 text-right">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleDelete(saved.courseId)}
+                    className="h-8 w-8 p-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                    style={{ color: "oklch(0.60 0.22 27)" }}
+                  >
+                    <Trash2 size={14} />
+                  </Button>
+                </TableCell>
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {courses.map((saved) => (
-                <TableRow key={saved.id}>
-                  <TableCell className="font-medium">{saved.course.name}</TableCell>
-                  <TableCell>{saved.course.university.name}</TableCell>
-                  <TableCell>{saved.course.university.country.name}</TableCell>
-                  <TableCell>{saved.course.studyLevel.replace("_", " ")}</TableCell>
-                  <TableCell>{saved.course.duration} months</TableCell>
-                  <TableCell>{saved.course.currency} {saved.course.tuitionFees.toLocaleString()}</TableCell>
-                  <TableCell>
-                    <span className="font-semibold text-emerald-600">{saved.score.toFixed(0)}%</span>
-                  </TableCell>
-                  <TableCell>{getStatusBadge(saved.status)}</TableCell>
-                  <TableCell className="text-right">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleDelete(saved.courseId)}
-                    >
-                      <Trash2 size={16} className="text-red-500" />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
 
       {/* Summary Card */}
-      <Card className="bg-emerald-50 border-emerald-200">
-        <CardContent className="p-4">
-          <div className="grid grid-cols-3 gap-4">
-            <div>
-              <p className="text-sm text-gray-600">Total Saved</p>
-              <p className="text-2xl font-bold text-emerald-700">{courses.length}</p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-600">Eligible</p>
-              <p className="text-2xl font-bold text-emerald-700">
-                {courses.filter(c => c.status === "ELIGIBLE").length}
+      <div
+        className="rounded-2xl p-5 relative overflow-hidden"
+        style={{
+          background: "linear-gradient(135deg, oklch(0.65 0.18 160 / 0.08), oklch(0.62 0.20 195 / 0.06))",
+          border: "1px solid oklch(0.65 0.18 160 / 0.2)",
+          backdropFilter: "blur(16px)",
+        }}
+      >
+        {/* top glow */}
+        <div
+          className="absolute top-0 inset-x-0 h-[1px] pointer-events-none"
+          style={{ background: "linear-gradient(90deg, transparent, oklch(0.65 0.18 160 / 0.5), oklch(0.62 0.20 195 / 0.3), transparent)" }}
+        />
+        <div className="grid grid-cols-3 gap-6">
+          {[
+            { label: "Total Saved", value: courses.length, color: "oklch(0.68 0.22 290)" },
+            { label: "Eligible", value: courses.filter(c => c.status === "ELIGIBLE").length, color: "oklch(0.65 0.18 160)" },
+            { label: "Borderline", value: courses.filter(c => c.status === "BORDERLINE").length, color: "oklch(0.72 0.18 80)" },
+          ].map((s) => (
+            <div key={s.label}>
+              <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-1" style={{ color: "oklch(0.45 0.03 270)" }}>
+                {s.label}
               </p>
+              <p className="text-2xl font-bold" style={{ color: s.color }}>{s.value}</p>
             </div>
-            <div>
-              <p className="text-sm text-gray-600">Borderline</p>
-              <p className="text-2xl font-bold text-yellow-600">
-                {courses.filter(c => c.status === "BORDERLINE").length}
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

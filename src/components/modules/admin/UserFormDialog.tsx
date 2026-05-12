@@ -109,7 +109,7 @@ export function UserFormDialog() {
                   <FormControl>
                     <select
                       {...field}
-                      className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2"
+                      className="flex h-10 w-full rounded-xl border px-3 py-2 text-sm" style={{ background: "oklch(0.09 0.018 272 / 0.7)", borderColor: "oklch(0.26 0.04 272 / 0.6)", color: "oklch(0.78 0.015 268)" }}
                     >
                       <option value="COUNSELOR">COUNSELOR</option>
                       <option value="ADMIN">ADMIN</option>

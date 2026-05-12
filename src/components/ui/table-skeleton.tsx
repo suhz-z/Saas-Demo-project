@@ -8,7 +8,7 @@ export function TableSkeleton() {
         <Skeleton className="h-5 w-72" />
       </div>
       
-      <div className="border border-border/40 rounded-xl overflow-hidden bg-white/50 backdrop-blur-sm">
+      <div className="rounded-2xl overflow-hidden" style={{ background: "linear-gradient(145deg, oklch(0.11 0.022 272 / 0.75), oklch(0.09 0.018 275 / 0.65))", border: "1px solid oklch(0.24 0.035 272 / 0.65)" }}>
         <div className="p-4 border-b border-border/40 flex justify-between items-center bg-muted/20">
           <Skeleton className="h-10 w-64" />
           <div className="flex gap-2">

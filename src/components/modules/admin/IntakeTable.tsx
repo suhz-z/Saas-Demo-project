@@ -44,7 +44,7 @@ export function IntakeTable({ intakes }: { intakes: AcademicCycle[] }) {
       </div>
 
       {/* Table */}
-      <div className="bg-white dark:bg-card rounded-xl border border-border/50 shadow-sm overflow-hidden">
+      <div className="rounded-2xl overflow-hidden relative" style={{ background: "linear-gradient(145deg, oklch(0.11 0.022 272 / 0.75), oklch(0.09 0.018 275 / 0.65))", border: "1px solid oklch(0.24 0.035 272 / 0.65)", backdropFilter: "blur(20px)", boxShadow: "0 4px 24px oklch(0 0 0 / 0.25), inset 0 1px 0 oklch(1 0 0 / 0.03)" }}>
         <Table>
           <TableHeader>
             <TableRow className="hover:bg-transparent border-b border-border/40">
